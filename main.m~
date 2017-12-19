@@ -81,9 +81,7 @@ while max(abs(Ddeltak, DeltaVk)) >= toler
     H22 = retornaH22();
     DeltaVk = inv(GQV)*H22'*inv(RQV)*(Z(5:end)-h(5:end));
     Vk = Vk + DeltaVk;
-    
-    H11 = retornaH11();
 end
 
 
-%% ESTIMADOR DESACOPLADO NO MODELO
+%% ESTIMADOR

@@ -53,13 +53,15 @@ Z = [0.38041 -0.97527 -1.68090 2.38200 0.98381 0.96892 0.22423 -0.64493 -1.04220
 
 %% Montagem do vetor de estados
 %x = [delta2 delta3 delta4 V1 V2 V3 V4]'
-x = [0 0 0 1 1 1 1]'; %valores iniciais
+deltak = [0 0 0]';
+Vk = [1 1 1 1]';
+x = [deltak; Vk]'; %valores iniciais
 
 %% Montagem das submatrizes
-H11 = retornaH11();
-H12 = retornaH12();
-H21 = retornH21();
-H22 = retornaH22();
+H11 = retornaH11(deltak, Y);
+H12 = retornaH12(Vk, Y);
+H21 = retornH21(delta, Y);
+H22 = retornaH22(Vk, Y);
 
 
 %% Cálculo da matriz Gpdelta
@@ -71,19 +73,22 @@ GQV = H12'*inv(R)*H12 + H22'*inv(R)*H22;
 %% ESTIMADOR DESACOPLADO NO ALGORITMO
 Ddeltak = 10^6;
 DeltaVk = 10^6;
-deltak = [0 0 0]';
-Vk = [1 1 1 1]';
 while max(abs(Ddeltak, DeltaVk)) >= toler
-    h = retornah();
+    h = retornah(deltak, Vk, Y);
     Ddeltak = inv(Gpdelta)*H11'*inv(RPdelta)*(Z(1:4) - h(1:4));
     deltak = deltak + Ddeltak;
     
-    H22 = retornaH22();
+    H22 = retornaH22(Vk, Y);
     DeltaVk = inv(GQV)*H22'*inv(RQV)*(Z(5:end)-h(5:end));
     Vk = Vk + DeltaVk;
     
-    H11 = retornaH11();
+    H11 = retornaH11(deltak, Y);
 end
 
 
-%% ESTIMADOR DESACOPLADO NO MODELO
+%% FUNCOES
+function H = retornaH11(deltak, Vk, Y)
+H = [DtijDj(Vk(1), Vk(2), real(Y(1,2)), imag(Y(1,2)), 0, deltak(1)) 0 0;
+    0 DtijDj(Vk(3), Vk(1), real(Y(3,1)), imag(Y(3,1)), deltak(2), 0) 0;
+    DpiDdi(i,j, V, G, B, deltai, deltaj)
+    
