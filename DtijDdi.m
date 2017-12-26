@@ -1,2 +1,2 @@
 function d = DtijDdi(Vi, Vj, Gij, Bij, deltai, deltaj)
-d = -DtijDdj;
+d = -DtijDdj(Vi, Vj, Gij, Bij, deltai, deltaj);

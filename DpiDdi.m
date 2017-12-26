@@ -1,7 +1,10 @@
-function d = DpiDdi(i,j, V, G, B, deltai, deltaj)
+function d = DpiDdi(i,V, G, B, delta)
 soma = 0;
+delta = [0; delta];
 for n=1:size(G,2)
-    soma = soma + V(n)*(G(i,j)*sin(deltai-deltaj)-B(i,j)*cos(deltai-deltaj));
+    if n~=i
+        soma = soma + V(n)*(-G(i,n)*sin(delta(i)-delta(n))+B(i,n)*cos(delta(i)-delta(n)));
+    end
 end
 
 d = V(i)*soma;

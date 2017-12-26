@@ -1,7 +1,10 @@
-function d = DqiDVi(i,j, V, G, B, deltai, deltaj)
+function d = DqiDVi(i, V, G, B, delta)
 soma = 0;
+delta = [0; delta];
 for n=1:size(G,2)
-    soma = soma + (G(i,j)*sin(deltai-deltaj)-B(i,j)*cos(deltai-deltaj));
+    if i~=n
+        soma = soma + (G(i,n)*sin(delta(i)-delta(n))-B(i,n)*cos(delta(i)-delta(n)));
+    end
 end
 
-d = soma;
+d = -soma;
