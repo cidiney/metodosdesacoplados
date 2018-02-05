@@ -1,6 +1,6 @@
 clc
 clear all
-
+close all
 
 
 
@@ -43,10 +43,10 @@ end
 for n=1:size(Y,1)
     Y(n,n) = -sum(Y(n,:));
 end
-% Y(1,1) = 8.9852-i*44.8360;
-% Y(2,2) = 8.9852-i*44.8360;
-% Y(3,3) = 8.1933-i*40.8638;
-% Y(4,4) = 8.1933-i*40.8638;
+Y(1,1) = 8.9852-i*44.8360;
+Y(2,2) = 8.9852-i*44.8360;
+Y(3,3) = 8.1933-i*40.8638;
+Y(4,4) = 8.1933-i*40.8638;
 %keyboard
 %% Matriz de variâncias R
 RPdelta = eye(4)*10^-2;
@@ -83,18 +83,26 @@ GQV = H22'*inv(RQV)*H22;
 %% ESTIMADOR DESACOPLADO NO MODELO
 Ddeltak = 10^6;
 DeltaVk = 10^6;
-while max(abs([Ddeltak; DeltaVk])) >= toler
+
+iter = 0;
+errr = [];
+h = retornah(deltak, Vk, Y);
+while max(abs([Z(5:end)-h(5:end)])) >= toler
     h = retornah(deltak, Vk, Y);
     Ddeltak = inv(Gpdelta)*H11'*inv(RPdelta)*(Z(1:4) - h(1:4));
     deltak = deltak + Ddeltak;
     
-    H22 = retornaH22(deltak, Vk, Y);
     DeltaVk = inv(GQV)*H22'*inv(RQV)*(Z(5:end)-h(5:end));
     Vk = Vk + DeltaVk;
     
     H11 = retornaH11(deltak, Vk, Y);
+    H22 = retornaH22(deltak, Vk, Y);
+    
+    iter = iter + 1;
+    errr(iter) = norm(Z(5:end)-h(5:end));
 end
 
+plot(errr)
 
 %% FUNCOES
 

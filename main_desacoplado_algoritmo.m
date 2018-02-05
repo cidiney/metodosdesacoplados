@@ -1,6 +1,6 @@
 clc
 clear all
-
+close all
 
 
 
@@ -43,19 +43,20 @@ end
 for n=1:size(Y,1)
     Y(n,n) = -sum(Y(n,:));
 end
-% Y(1,1) = 8.9852-i*44.8360;
-% Y(2,2) = 8.9852-i*44.8360;
-% Y(3,3) = 8.1933-i*40.8638;
-% Y(4,4) = 8.1933-i*40.8638;
+ Y(1,1) = 8.9852-i*44.8360;
+ Y(2,2) = 8.9852-i*44.8360;
+ Y(3,3) = 8.1933-i*40.8638;
+ Y(4,4) = 8.1933-i*40.8638;
 %keyboard
+
 %% Matriz de variâncias R
-RPdelta = eye(4)*10^-2;
-RQV = eye(6)*10^-2;
+RPdelta = eye(4)*10^-4;
+RQV = eye(6)*10^-4;
 R = [[RPdelta zeros(size(RPdelta,1), size(RQV,2))];
     [zeros(size(RQV,1), size(RPdelta,2)) RQV]];
 
 %especificando a tolerância
-toler = min(R)*0.1;
+toler = max(max(R))*0.1;
 
 %% Montagem do vetor de quantidades medidas do problema
 %Z = [[t12 t31 P2 P4]'; [u12 u31 Q2 Q4 V2 V3]']
@@ -72,7 +73,6 @@ H11 = retornaH11(deltak, Vk, Y);
 H12 = retornaH12(deltak, Vk, Y);
 H21 = retornaH21(deltak, Vk, Y);
 H22 = retornaH22(deltak, Vk, Y);
-
 
 %% Cálculo da matriz Gpdelta
 Gpdelta = H11'*inv(RPdelta)*H11 + H21'*inv(RQV)*H21;
@@ -91,18 +91,30 @@ disp(H)
 disp('Matriz de informação - inicial')
 disp(G)
 
-while max(abs([Ddeltak; DeltaVk])) >= toler
+rcond(Gpdelta)
+rcond(GQV)
+    
+iter = 0;
+errr = [];
+h = retornah(deltak, Vk, Y);
+while max(abs([Z(5:end)-h(5:end)])) >= toler
     h = retornah(deltak, Vk, Y);
     Ddeltak = inv(Gpdelta)*H11'*inv(RPdelta)*(Z(1:4) - h(1:4));
     deltak = deltak + Ddeltak;
+        
     
-    H22 = retornaH22(deltak, Vk, Y);
     DeltaVk = inv(GQV)*H22'*inv(RQV)*(Z(5:end)-h(5:end));
     Vk = Vk + DeltaVk;
-    
+
+    %% Montagem das submatrizes
     H11 = retornaH11(deltak, Vk, Y);
+    H22 = retornaH22(deltak, Vk, Y);
+ 
+    iter = iter + 1;
+    errr(iter) = norm(Z(5:end)-h(5:end));
 end
 
+plot(errr)
 
 %% FUNCOES
 
